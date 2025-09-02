@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Voice to Image Choice</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(135deg, #89f7fe, #66a6ff);
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 20px;
+      color: #222;
+    }
+    #status {
+      font-size: 18px;
+      margin: 10px;
+      color: #333;
+    }
+    #images {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    .img-btn {
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .img-btn img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .img-btn:hover {
+      transform: scale(1.05);
+    }
+    #speakBtn {
+      font-size: 18px;
+      padding: 12px 20px;
+      margin-top: 30px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #speakBtn:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎤 Voice to Image Choice</h1>
+  <div id="status">Click the button and say: Tea, Coffee, Milk, etc.</div>
+  <button id="speakBtn">Start Speaking</button>
+
+  <div id="images"></div>
+
+  <script>
+    // Keyword-to-image mapping (replace with your actual image file paths)
+    const choices = {
+      "tea": "tea.jpg",
+      "coffee": "coffee.jpg",
+      "milk": "milk.jpg",
+      "water": "water.jpg",
+      "apple": "apple.jpg",
+      "banana": "banana.jpg",
+      "rice": "rice.jpg",
+      "bread": "bread.jpg",
+      "dog": "dog.jpg",
+      "cat": "cat.jpg",
+      "elephant": "elephant.jpg",
+      "cow": "cow.jpg",
+      "happy": "happy.jpg",
+      "sad": "sad.jpg",
+      "angry": "angry.jpg",
+      "tired": "tired.jpg",
+      "cry": "cry.jpg",
+      "toilet": "toilet.jpg",
+      "brush": "brush.jpg",
+      "bath": "bath.jpg",
+      "school": "school.jpg",
+      "playground": "playground.jpg",
+      "park": "park.jpg",
+      "book": "book.jpg",
+      "toy": "toy.jpg",
+      "red": "red.jpg",
+      "blue": "blue.jpg",
+      "green": "green.jpg",
+      "yellow": "yellow.jpg"
+    };
+
+    const statusEl = document.getElementById("status");
+    const imagesEl = document.getElementById("images");
+    const speakBtn = document.getElementById("speakBtn");
+
+    function showImages(keywords) {
+      imagesEl.innerHTML = ""; // Clear old images
+      keywords.forEach(keyword => {
+        if (choices[keyword]) {
+          const imgBtn = document.createElement("button");
+          imgBtn.className = "img-btn";
+          imgBtn.innerHTML = `<img src="${choices[keyword]}" alt="${keyword}">`;
+          imgBtn.onclick = () => {
+            alert("You selected: " + keyword);
+          };
+          imagesEl.appendChild(imgBtn);
+        }
+      });
+    }
+
+    function startRecognition() {
+      // Browser speech recognition
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech Recognition not supported in this browser.");
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      statusEl.textContent = "Listening... 🎤";
+
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript.toLowerCase();
+        statusEl.textContent = "You said: " + text;
+
+        // Match words
+        const mentioned = Object.keys(choices).filter(word => text.includes(word));
+        if (mentioned.length > 0) {
+          showImages(mentioned);
+        } else {
+          alert("No known options mentioned. Try again.");
+        }
+      };
+
+      recognition.onerror = (event) => {
+        statusEl.textContent = "Error: " + event.error;
+      };
+    }
+
+    speakBtn.addEventListener("click", startRecognition);
+  </script>
+</body>
+</html>
